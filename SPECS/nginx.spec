@@ -67,30 +67,8 @@ Source10: nginx.suse.logrotate
 Source11: nginx-debug.service
 Source12: COPYRIGHT
 
-Source100: https://github.com/openresty/lua-nginx-module/archive/v%{ngx_lua_version}.tar.gz#/lua-nginx-module-%{ngx_lua_version}.tar.gz 
-Source101: https://github.com/openresty/headers-more-nginx-module/archive/master.tar.gz#/headers-more-nginx-module-master.tar.gz
-Source102: https://github.com/cloudflare/lua-nginx-cache-module/archive/master.tar.gz#/lua-upstream-cache-nginx-module-master.tar.gz
-Source104: https://github.com/wandenberg/nginx-sorted-querystring-module/archive/%{ngx_sorted_query_string_version}.tar.gz#/nginx-sorted-querystring-module-%{ngx_sorted_query_string_version}.tar.gz
-Source105: https://github.com/arut/nginx-rtmp-module/archive/master.tar.gz#/nginx-rtmp-module-master.tar.gz
-Source106: https://github.com/FRiCKLE/ngx_cache_purge/archive/master.tar.gz#/ngx_cache_purge-master.tar.gz
-Source107: https://github.com/replay/ngx_http_secure_download/archive/master.tar.gz#/ngx_http_secure_download-master.tar.gz
-Source108: https://github.com/replay/ngx_http_consistent_hash/archive/master.tar.gz#/ngx_http_consistent_hash-master.tar.gz
-Source109: https://github.com/openresty/srcache-nginx-module/archive/master.tar.gz#/srcache-nginx-module-master.tar.gz
-Source110: https://github.com/openresty/redis2-nginx-module/archive/master.tar.gz#/redis2-nginx-module-master.tar.gz
-Source111: https://github.com/openresty/memc-nginx-module/archive/master.tar.gz#/memc-nginx-module-master.tar.gz
-Source112: https://github.com/openresty/lua-upstream-nginx-module/archive/master.tar.gz#/lua-upstream-nginx-module-master.tar.gz
-Source113: https://github.com/openresty/echo-nginx-module/archive/master.tar.gz#/echo-nginx-module-master.tar.gz
-Source114: https://github.com/bpaquet/ngx_http_enhanced_memcached_module/archive/master.tar.gz#/ngx_http_enhanced_memcached_module-master.tar.gz
-Source115: https://github.com/arut/nginx-dav-ext-module/archive/master.tar.gz#/nginx-dav-ext-module-master.tar.gz
-
+Source103: https://github.com/yaoweibin/nginx_upstream_check_module/archive/master.tar.gz#/nginx_upstream_check_module-master.tar.gz
 Source120: https://openssl.org/source/openssl-%{ngx_openssl_version}.tar.gz  
-
-Patch102: lua-upstream-cache-nginx-module.dynamic-module.patch
-Patch106: ngx_cache_purge.dynamic-module.patch
-Patch107: ngx_http_secure_download.dynamic-module.patch
-Patch108: ngx_http_consistent_hash.dynamic-module.patch
-Patch115: nginx-dav-ext.dynamic-module.patch
-
 License: 2-clause BSD-like license
 
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
@@ -115,12 +93,8 @@ a mail proxy server.
 %endif
 
 %prep
-%setup -q -a 100 -a 101 -a 102 -a 104 -a 105 -a 106 -a 107 -a 108 -a 109 -a 110 -a 111 -a 112 -a 113 -a 114 -a 115 -a 120
-%patch102 -d ./lua-upstream-cache-nginx-module-master -p1
-%patch106 -d ./ngx_cache_purge-master -p1
-%patch107 -d ./ngx_http_secure_download-master -p1
-%patch108 -d ./ngx_http_consistent_hash-master -p1
-%patch115 -d ./nginx-dav-ext-module-master -p1
+%setup -q -a 103 -a 120
+-patch -p0 < ./nginx_upstream_check_module-master/check_1.9.2+.patch
 cp %{SOURCE2} .
 sed -e 's|%%DEFAULTSTART%%|2 3 4 5|g' -e 's|%%DEFAULTSTOP%%|0 1 6|g' \
     -e 's|%%PROVIDES%%|nginx|g' < %{SOURCE2} > nginx.init
@@ -149,7 +123,6 @@ sed -e 's|%%DEFAULTSTART%%||g' -e 's|%%DEFAULTSTOP%%|0 1 2 3 4 5 6|g' \
         --with-http_realip_module \
         --with-http_addition_module \
         --with-http_sub_module \
-        --with-http_dav_module \
         --with-http_flv_module \
         --with-http_mp4_module \
         --with-http_gunzip_module \
@@ -169,21 +142,7 @@ sed -e 's|%%DEFAULTSTART%%||g' -e 's|%%DEFAULTSTOP%%|0 1 2 3 4 5 6|g' \
         --with-mail_ssl_module \
         --with-file-aio \
         --with-ipv6 \
-        --add-dynamic-module=./lua-nginx-module-%{ngx_lua_version} \
-        --add-dynamic-module=./lua-upstream-cache-nginx-module-master \
-        --add-dynamic-module=./headers-more-nginx-module-master \
-        --add-dynamic-module=./nginx-sorted-querystring-module-%{ngx_sorted_query_string_version} \
-        --add-dynamic-module=./nginx-rtmp-module-master \
-        --add-dynamic-module=./ngx_cache_purge-master \
-        --add-dynamic-module=./ngx_http_secure_download-master \
-        --add-dynamic-module=./ngx_http_consistent_hash-master \
-        --add-dynamic-module=./redis2-nginx-module-master \
-        --add-dynamic-module=./srcache-nginx-module-master \
-        --add-dynamic-module=./memc-nginx-module-master \
-        --add-dynamic-module=./lua-upstream-nginx-module-master \
-        --add-dynamic-module=./echo-nginx-module-master \
-        --add-dynamic-module=./ngx_http_enhanced_memcached_module-master \
-        --add-dynamic-module=./nginx-dav-ext-module-master \
+        --add-module=./nginx_upstream_check_module-master \
         --with-debug \
         %{?with_http2:--with-http_v2_module} \
         --with-cc-opt="%{optflags} $(pcre-config --cflags)%{?tcp_fast_open: -DTCP_FASTOPEN=23}" \
@@ -232,21 +191,7 @@ make %{?_smp_mflags}
         --with-mail_ssl_module \
         --with-file-aio \
         --with-ipv6 \
-        --add-dynamic-module=./lua-nginx-module-%{ngx_lua_version} \
-        --add-dynamic-module=./lua-upstream-cache-nginx-module-master \
-        --add-dynamic-module=./headers-more-nginx-module-master \
-        --add-dynamic-module=./nginx-sorted-querystring-module-%{ngx_sorted_query_string_version} \
-        --add-dynamic-module=./nginx-rtmp-module-master \
-        --add-dynamic-module=./ngx_cache_purge-master \
-        --add-dynamic-module=./ngx_http_secure_download-master \
-        --add-dynamic-module=./ngx_http_consistent_hash-master \
-        --add-dynamic-module=./redis2-nginx-module-master \
-        --add-dynamic-module=./srcache-nginx-module-master \
-        --add-dynamic-module=./memc-nginx-module-master \
-        --add-dynamic-module=./lua-upstream-nginx-module-master \
-        --add-dynamic-module=./echo-nginx-module-master \
-        --add-dynamic-module=./ngx_http_enhanced_memcached_module-master \
-        --add-dynamic-module=./nginx-dav-ext-module-master \
+        --add-module=./nginx_upstream_check_module-master \
         %{?with_http2:--with-http_v2_module} \
         --with-cc-opt="%{optflags} $(pcre-config --cflags) %{?tcp_fast_open: -DTCP_FASTOPEN=23}" \
         $*
@@ -439,6 +384,9 @@ if [ $1 -ge 1 ]; then
 fi
 
 %changelog
+* Mon Oct 31 2016 Pierce Fortin <pfortin@smashfly.com> - 1.11.5.2
+- Removed all plugins except for openSSL, Added Upstream Check Module
+
 * Fri Oct 21 2016 Hiroaki Nakamura <hnakamur@gmail.com> - 1.11.5.2
 - Fix PIDFile path in nginx.service and nginx-debug.source
 
