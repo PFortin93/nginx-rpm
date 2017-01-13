@@ -68,6 +68,7 @@ Source11: nginx-debug.service
 Source12: COPYRIGHT
 
 Source103: https://github.com/yaoweibin/nginx_upstream_check_module/archive/master.tar.gz#/nginx_upstream_check_module-master.tar.gz
+Source104: https://github.com/kvspb/nginx-auth-ldap/archive/master.tar.gz#/nginx-auth-ldap.tar.gz
 Source120: https://openssl.org/source/openssl-%{ngx_openssl_version}.tar.gz  
 License: 2-clause BSD-like license
 
@@ -93,7 +94,7 @@ a mail proxy server.
 %endif
 
 %prep
-%setup -q -a 103 -a 120
+%setup -q -a 103 -a 104 -a 120
 -patch -p0 < ./nginx_upstream_check_module-master/check_1.9.2+.patch
 cp %{SOURCE2} .
 sed -e 's|%%DEFAULTSTART%%|2 3 4 5|g' -e 's|%%DEFAULTSTOP%%|0 1 6|g' \
@@ -143,6 +144,7 @@ sed -e 's|%%DEFAULTSTART%%||g' -e 's|%%DEFAULTSTOP%%|0 1 2 3 4 5 6|g' \
         --with-file-aio \
         --with-ipv6 \
         --add-module=./nginx_upstream_check_module-master \
+        --add-module=./nginx-auth-ldap \
         --with-debug \
         %{?with_http2:--with-http_v2_module} \
         --with-cc-opt="%{optflags} $(pcre-config --cflags)%{?tcp_fast_open: -DTCP_FASTOPEN=23}" \
@@ -192,6 +194,7 @@ make %{?_smp_mflags}
         --with-file-aio \
         --with-ipv6 \
         --add-module=./nginx_upstream_check_module-master \
+        --add-module=./nginx-auth-ldap \
         %{?with_http2:--with-http_v2_module} \
         --with-cc-opt="%{optflags} $(pcre-config --cflags) %{?tcp_fast_open: -DTCP_FASTOPEN=23}" \
         $*
@@ -384,6 +387,9 @@ if [ $1 -ge 1 ]; then
 fi
 
 %changelog
+* Fri Jan 13 2017 Pierce Fortin <pfortin@smashfly.com) - 1.11.5.2
+-Added plugin nginx LDAP Auth
+
 * Mon Oct 31 2016 Pierce Fortin <pfortin@smashfly.com> - 1.11.5.2
 - Removed all plugins except for openSSL, Added Upstream Check Module
 
