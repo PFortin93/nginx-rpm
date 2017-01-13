@@ -7,6 +7,7 @@ This build includes the following modules as dynamic modules:
 
 
 * [yaoweibin/nginx_upstream_check_module](https://github.com/yaoweibin/nginx_upstream_check_module)
+* [kvspd/nginx-auth-ldap](https://github.com/kvspb/nginx-auth-ldap)
 
 Warning: Modules may be added or deleted without notice.
 
