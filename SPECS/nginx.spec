@@ -95,7 +95,7 @@ a mail proxy server.
 
 %prep
 %setup -q -a 103 -a 104 -a 120
--patch -p0 < ./nginx_upstream_check_module-master/check_1.9.2+.patch
+patch -p0 < ./nginx_upstream_check_module-master/check_1.11.5+.patch
 cp %{SOURCE2} .
 sed -e 's|%%DEFAULTSTART%%|2 3 4 5|g' -e 's|%%DEFAULTSTOP%%|0 1 6|g' \
     -e 's|%%PROVIDES%%|nginx|g' < %{SOURCE2} > nginx.init
